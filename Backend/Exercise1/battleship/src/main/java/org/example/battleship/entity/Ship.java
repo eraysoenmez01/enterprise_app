@@ -12,11 +12,11 @@ public class Ship {
     private int x;
     private int y;
 
-    private int size; // 👈 HINZUGEFÜGT
+    private int size;
 
     @ManyToOne
     @JoinColumn(name = "player_id")
-    @JsonBackReference // ✅ verhindert Endlosschleife
+    @JsonBackReference 
     private Player player;
 
     public Ship() {}

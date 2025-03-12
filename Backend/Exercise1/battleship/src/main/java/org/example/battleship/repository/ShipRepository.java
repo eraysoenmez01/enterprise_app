@@ -6,5 +6,4 @@ import java.util.List;
 
 public interface ShipRepository extends JpaRepository<Ship, Long> {
     List<Ship> findByPlayerId(Long playerId);
-    void deleteByPlayerIdAndXAndY(Long playerId, int x, int y);
 }

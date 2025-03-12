@@ -44,15 +44,15 @@ public class GameController {
         Game game = gameRepository.findById(gameId).orElseThrow(() -> new RuntimeException("Game not found"));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("📌 Game: ").append(game.getName()).append(" (ID: ").append(game.getId()).append(")\n");
-        sb.append("🟢 Active: ").append(game.isActive()).append("\n");
-        sb.append("🎯 Current Turn: ").append(game.getCurrentTurn() != null ? game.getCurrentTurn().getName() : "None").append("\n");
-        sb.append("🏁 Finished: ").append(game.isFinished()).append("\n");
-        sb.append("🏆 Winner: ").append(game.getWinner() != null ? game.getWinner().getName() : "None").append("\n\n");
+        sb.append("Game: ").append(game.getName()).append(" (ID: ").append(game.getId()).append(")\n");
+        sb.append("Active: ").append(game.isActive()).append("\n");
+        sb.append("Current Turn: ").append(game.getCurrentTurn() != null ? game.getCurrentTurn().getName() : "None").append("\n");
+        sb.append("Finished: ").append(game.isFinished()).append("\n");
+        sb.append("Winner: ").append(game.getWinner() != null ? game.getWinner().getName() : "None").append("\n\n");
 
         for (Player player : game.getPlayers()) {
             long shipCount = shipRepository.findByPlayerId(player.getId()).size();
-            sb.append("👤 Player: ").append(player.getName())
+            sb.append("Player: ").append(player.getName())
                     .append(" | Ships: ").append(shipCount).append("\n");
         }
 

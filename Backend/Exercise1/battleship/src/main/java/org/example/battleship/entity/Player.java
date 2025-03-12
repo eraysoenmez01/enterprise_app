@@ -1,7 +1,6 @@
 package org.example.battleship.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -25,7 +24,7 @@ public class Player {
     }
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL)
-    @JsonManagedReference // ✅ Schiffe anzeigen
+    @JsonManagedReference
     private List<Ship> ships = new ArrayList<>();
 
     public List<Ship> getShips() {

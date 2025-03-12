@@ -1,9 +1,7 @@
 package org.example.battleship.rest;
 
 import org.example.battleship.dto.CreatePlayerRequest;
-import org.example.battleship.entity.Game;
 import org.example.battleship.entity.Player;
-import org.example.battleship.service.GameService;
 import org.example.battleship.service.PlayerService;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +12,9 @@ import java.util.List;
 public class PlayerController {
 
     private final PlayerService playerService;
-    private final GameService gameService;
 
-    public PlayerController(PlayerService playerService, GameService gameService) {
+    public PlayerController(PlayerService playerService) {
         this.playerService = playerService;
-        this.gameService = gameService;
     }
 
     @PostMapping

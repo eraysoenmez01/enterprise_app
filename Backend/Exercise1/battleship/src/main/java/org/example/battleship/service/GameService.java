@@ -17,7 +17,7 @@ public class GameService {
 
     public Game saveGame(Game game) {
         if (game.getPlayers().size() == 2 && game.getCurrentTurn() == null) {
-            game.setCurrentTurn(game.getPlayers().get(0)); // erster Spieler beginnt
+            game.setCurrentTurn(game.getPlayers().get(0));
         }
         return gameRepository.save(game);
     }

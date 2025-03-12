@@ -7,7 +7,6 @@ import org.example.battleship.entity.Ship;
 import org.example.battleship.repository.GameRepository;
 import org.example.battleship.repository.PlayerRepository;
 import org.example.battleship.repository.ShipRepository;
-import org.example.battleship.service.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,16 +20,13 @@ public class ShipController {
     private final ShipRepository shipRepository;
     private final PlayerRepository playerRepository;
     private final GameRepository gameRepository;
-    private final GameService gameService;
 
-    public ShipController(ShipRepository shipRepository, PlayerRepository playerRepository, GameRepository gameRepository, GameService gameService) {
+    public ShipController(ShipRepository shipRepository, PlayerRepository playerRepository, GameRepository gameRepository) {
         this.shipRepository = shipRepository;
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
-        this.gameService = gameService;
     }
 
-    // ✅ SCHIFFE SETZEN
     @PostMapping("/place")
     public ResponseEntity<String> placeShips(@RequestBody CreateShipRequest request) {
         Player player = playerRepository.findById(request.getPlayerId())
@@ -43,7 +39,7 @@ public class ShipController {
             Ship ship = new Ship();
             ship.setX(x);
             ship.setY(y);
-            ship.setSize(1); // alle gleich groß
+            ship.setSize(1);
             ship.setPlayer(player);
 
             shipRepository.save(ship);
@@ -66,26 +62,22 @@ public class ShipController {
                 .orElseThrow(() -> new RuntimeException("Player not found"));
 
         if (!shooter.equals(game.getCurrentTurn())) {
-            return ResponseEntity.badRequest().body("❌ Not your turn!");
+            return ResponseEntity.badRequest().body("Not your turn!");
         }
 
-        // Gegner finden
         Player opponent = game.getPlayers().stream()
                 .filter(p -> !p.getId().equals(playerId))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Opponent not found"));
 
-        // Treffer prüfen
         List<Ship> opponentShips = shipRepository.findByPlayerId(opponent.getId());
         Optional<Ship> hitShip = opponentShips.stream()
                 .filter(s -> s.getX() == x && s.getY() == y)
                 .findFirst();
 
         if (hitShip.isPresent()) {
-            // Schiff entfernen
             shipRepository.delete(hitShip.get());
 
-            // Hat Gegner noch Schiffe?
             boolean opponentHasShipsLeft = shipRepository.findByPlayerId(opponent.getId()).size() > 0;
 
             if (!opponentHasShipsLeft) {
@@ -94,22 +86,19 @@ public class ShipController {
                 game.setWinner(shooter);
                 gameRepository.save(game);
 
-                return ResponseEntity.ok("💥 HIT! " + opponent.getName() + " hat keine Schiffe mehr! "
+                return ResponseEntity.ok("HIT! " + opponent.getName() + " hat keine Schiffe mehr! "
                         + shooter.getName() + " gewinnt!");
             }
 
-            // Spielerwechsel nur, wenn Spiel nicht vorbei ist
             game.setCurrentTurn(opponent);
             gameRepository.save(game);
-            return ResponseEntity.ok("💥 HIT!");
+            return ResponseEntity.ok("HIT!");
         }
 
-        // Verfehlt → Zug wechseln
         game.setCurrentTurn(opponent);
         gameRepository.save(game);
-        return ResponseEntity.ok("❌ MISS!");
+        return ResponseEntity.ok("MISS!");
     }
-    // ✅ ALLE SCHIFFE EINES SPIELERS ANZEIGEN
     @GetMapping("/player/{playerId}")
     public List<Ship> getShipsByPlayer(@PathVariable Long playerId) {
         return shipRepository.findByPlayerId(playerId);

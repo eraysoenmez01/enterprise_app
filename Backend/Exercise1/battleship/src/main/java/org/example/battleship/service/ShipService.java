@@ -30,7 +30,7 @@ public class ShipService {
             Ship ship = new Ship();
             ship.setX(x);
             ship.setY(y);
-            ship.setSize(1); // alle Schiffe gleich groß
+            ship.setSize(1);
             ship.setPlayer(player);
 
             shipRepository.save(ship);

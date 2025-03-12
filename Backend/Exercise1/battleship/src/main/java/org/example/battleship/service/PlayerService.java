@@ -27,12 +27,10 @@ public class PlayerService {
         player.setGame(game);
         Player savedPlayer = playerRepository.save(player);
 
-        // Spieler der Liste hinzufügen
         game.getPlayers().add(savedPlayer);
 
-        // Wenn 2 Spieler vorhanden und noch kein Spieler am Zug ist:
         if (game.getPlayers().size() == 2 && game.getCurrentTurn() == null) {
-            game.setCurrentTurn(game.getPlayers().get(0)); // erster Spieler ist am Zug
+            game.setCurrentTurn(game.getPlayers().get(0));
             gameRepository.save(game);
         }
 

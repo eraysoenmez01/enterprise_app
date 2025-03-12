@@ -3,8 +3,6 @@ package org.example.battleship.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.*;
-import org.example.battleship.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +10,7 @@ import java.util.List;
 @Entity
 public class Game {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Automatisch generierte ID durch DB
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -20,15 +18,14 @@ public class Game {
 
     @ManyToOne
     @JoinColumn(name = "current_turn_player_id")
-    @JsonIgnore // 🛑 Verhindert Endlosschleife!
+    @JsonIgnore
     private Player currentTurn;
 
     @ManyToOne
     @JoinColumn(name = "winner_id")
-    @JsonIgnore // 🛑 Verhindert Endlosschleife!
+    @JsonIgnore
     private Player winner;
 
-    // In Game.java
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Player> players = new ArrayList<>();
@@ -38,12 +35,12 @@ public class Game {
 
 
     public Game() {
-        this.active = true; // Standardwert setzen, falls nötig
+        this.active = true;
     }
 
     public Game(String name) {
         this.name = name;
-        this.active = true; // Spiel startet aktiv
+        this.active = true; 
     }
 
     public Long getId() {
