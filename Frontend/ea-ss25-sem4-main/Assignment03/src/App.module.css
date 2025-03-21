@@ -1,0 +1,42 @@
+.container {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 40px;
+    justify-content: center;
+    margin-top: 170px;
+  }
+  
+  .card {
+    height: 130px;
+    width: 130px;
+    font-size: 2rem;
+    background-color: lightgray;
+    border: none;
+    margin: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .flipped {
+    background-color: lightblue;
+  }
+
+  .toggleGroup {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  
+  .toggleGroup button {
+    padding: 0.5rem 1rem;
+    font-size: 1.2rem;
+    background-color: #ddd;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .activeToggle {
+    background-color: #aaa;
+  }

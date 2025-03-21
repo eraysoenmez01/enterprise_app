@@ -14,18 +14,15 @@ public class Ship {
 
     private int size;
 
-    @ManyToOne
-    @JoinColumn(name = "player_id")
-    @JsonBackReference 
-    private Player player;
+    private Long playerId;
 
     public Ship() {}
 
-    public Ship(int x, int y, int size, Player player) {
+    public Ship(int x, int y, int size, Long playerId) {
         this.x = x;
         this.y = y;
         this.size = size;
-        this.player = player;
+        this.playerId = playerId;
     }
 
     public Long getId() {
@@ -56,11 +53,11 @@ public class Ship {
         this.size = size;
     }
 
-    public Player getPlayer() {
-        return player;
+    public Long getPlayer() {
+        return playerId;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void setPlayer(Long playerId) {
+        this.playerId = playerId;
     }
 }

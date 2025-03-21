@@ -1,6 +1,6 @@
 package org.example.battleship_shipservices.repository;
 
-import org.example.battleship_gamerservices.entity.Ship;
+import org.example.battleship_shipservices.entity.Ship;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

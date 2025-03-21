@@ -1,8 +1,8 @@
 package org.example.battleship_playerservices.rest;
 
-import org.example.battleship_gamerservices.dto.CreatePlayerRequest;
-import org.example.battleship_gamerservices.entity.Player;
-import org.example.battleship_gamerservices.service.PlayerService;
+import org.example.battleship_playerservices.dto.CreatePlayerRequest;
+import org.example.battleship_playerservices.entity.Player;
+import org.example.battleship_playerservices.service.PlayerService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,5 +30,10 @@ public class PlayerController {
     @GetMapping
     public List<Player> getAllPlayers() {
         return playerService.getAllPlayers();
+    }
+
+    @GetMapping("/{id}/name")
+    public String getPlayerName(@PathVariable Long id) {
+        return playerService.getPlayerName(id);
     }
 }

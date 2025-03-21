@@ -1,56 +1,56 @@
 package org.example.battleship_shipservices.service;
 
-import org.example.battleship_gamerservices.entity.Player;
-import org.example.battleship_gamerservices.entity.Ship;
-import org.example.battleship_gamerservices.repository.PlayerRepository;
-import org.example.battleship_gamerservices.repository.ShipRepository;
+import org.example.battleship_shipservices.entity.Ship;
+import org.example.battleship_shipservices.repository.ShipRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 @Service
 public class ShipService {
 
-    private final PlayerRepository playerRepository;
     private final ShipRepository shipRepository;
+    private final RestTemplate restTemplate;
 
-    public ShipService(PlayerRepository playerRepository, ShipRepository shipRepository) {
-        this.playerRepository = playerRepository;
+    public ShipService(ShipRepository shipRepository, RestTemplate restTemplate) {
         this.shipRepository = shipRepository;
+        this.restTemplate = restTemplate;
     }
 
-    @GetMapping("/player/{playerId}/count")
-    public int countShipsByPlayerId(@PathVariable Long playerId) {
-        return shipRepository.findByPlayerId(playerId).size();
-    }
-    public List<Ship> placeShips(Long playerId, List<String> positions) {
-        Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new RuntimeException("Player not found"));
+    public void placeShips(Long playerId, List<String> positions) {
+        String url = "http://localhost:8081/api/players/" + playerId;
+        try {
+            restTemplate.getForObject(url, Object.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Player with ID " + playerId + " not found.");
+        }
 
         for (String pos : positions) {
             int x = Character.getNumericValue(pos.charAt(0));
             int y = Character.getNumericValue(pos.charAt(1));
-
-            Ship ship = new Ship();
-            ship.setX(x);
-            ship.setY(y);
-            ship.setSize(1);
-            ship.setPlayer(player);
-
+            Ship ship = new Ship(x, y, 1, playerId);
             shipRepository.save(ship);
         }
-
-        return shipRepository.findByPlayerId(playerId);
-    }
-
-    public boolean isHit(Long opponentId, int x, int y) {
-        return shipRepository.findByPlayerId(opponentId).stream()
-                .anyMatch(ship -> ship.getX() == x && ship.getY() == y);
     }
 
     public List<Ship> getShipsByPlayer(Long playerId) {
         return shipRepository.findByPlayerId(playerId);
+    }
+
+    public int countShipsByPlayerId(Long playerId) {
+        return shipRepository.findByPlayerId(playerId).size();
+    }
+
+    public boolean processGuess(Long targetPlayerId, int x, int y) {
+        List<Ship> ships = shipRepository.findByPlayerId(targetPlayerId);
+        for (Ship ship : ships) {
+            if (ship.getX() == x && ship.getY() == y) {
+                shipRepository.delete(ship);
+                return true;
+            }
+        }
+        return false;
     }
 }

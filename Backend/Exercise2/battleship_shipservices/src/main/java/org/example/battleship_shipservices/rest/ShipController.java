@@ -1,108 +1,50 @@
 package org.example.battleship_shipservices.rest;
 
-import org.example.battleship_gamerservices.dto.CreateShipRequest;
-import org.example.battleship_gamerservices.entity.Game;
-import org.example.battleship_gamerservices.entity.Player;
-import org.example.battleship_gamerservices.entity.Ship;
-import org.example.battleship_gamerservices.repository.GameRepository;
-import org.example.battleship_gamerservices.repository.PlayerRepository;
-import org.example.battleship_gamerservices.repository.ShipRepository;
+import org.example.battleship_shipservices.dto.CreateShipRequest;
+
+import org.example.battleship_shipservices.entity.Ship;
+import org.example.battleship_shipservices.service.ShipService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/ships")
 public class ShipController {
 
-    private final ShipRepository shipRepository;
-    private final PlayerRepository playerRepository;
-    private final GameRepository gameRepository;
+    private final ShipService shipService;
 
-    public ShipController(ShipRepository shipRepository, PlayerRepository playerRepository, GameRepository gameRepository) {
-        this.shipRepository = shipRepository;
-        this.playerRepository = playerRepository;
-        this.gameRepository = gameRepository;
+    public ShipController(ShipService shipService) {
+        this.shipService = shipService;
     }
 
     @PostMapping("/place")
     public ResponseEntity<String> placeShips(@RequestBody CreateShipRequest request) {
-        Player player = playerRepository.findById(request.getPlayerId())
-                .orElseThrow(() -> new RuntimeException("Player not found"));
-
-        for (String pos : request.getPositions()) {
-            int x = Character.getNumericValue(pos.charAt(0));
-            int y = Character.getNumericValue(pos.charAt(1));
-
-            Ship ship = new Ship();
-            ship.setX(x);
-            ship.setY(y);
-            ship.setSize(1);
-            ship.setPlayer(player);
-
-            shipRepository.save(ship);
+        try {
+            shipService.placeShips(request.getPlayerId(), request.getPositions());
+            return ResponseEntity.ok("Ships placed successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
 
-        return ResponseEntity.ok("Ships placed successfully.");
+    @GetMapping("/player/{playerId}")
+    public List<Ship> getShipsByPlayer(@PathVariable Long playerId) {
+        return shipService.getShipsByPlayer(playerId);
+    }
+
+    @GetMapping("/player/{playerId}/count")
+    public int countShipsByPlayerId(@PathVariable Long playerId) {
+        return shipService.countShipsByPlayerId(playerId);
     }
 
     @PostMapping("/guess")
-    public ResponseEntity<String> guess(
-            @RequestParam Long playerId,
-            @RequestParam Long gameId,
+    public ResponseEntity<Boolean> guess(
+            @RequestParam("playerId") Long targetPlayerId,
             @RequestParam int x,
             @RequestParam int y) {
-
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new RuntimeException("Game not found"));
-
-        Player shooter = playerRepository.findById(playerId)
-                .orElseThrow(() -> new RuntimeException("Player not found"));
-
-        if (!shooter.equals(game.getCurrentTurn())) {
-            return ResponseEntity.badRequest().body("Not your turn!");
-        }
-
-        Player opponent = game.getPlayers().stream()
-                .filter(p -> !p.getId().equals(playerId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Opponent not found"));
-
-        List<Ship> opponentShips = shipRepository.findByPlayerId(opponent.getId());
-        Optional<Ship> hitShip = opponentShips.stream()
-                .filter(s -> s.getX() == x && s.getY() == y)
-                .findFirst();
-
-        if (hitShip.isPresent()) {
-            shipRepository.delete(hitShip.get());
-
-            boolean opponentHasShipsLeft = shipRepository.findByPlayerId(opponent.getId()).size() > 0;
-
-            if (!opponentHasShipsLeft) {
-                game.setFinished(true);
-                game.setActive(false);
-                game.setWinner(shooter);
-                gameRepository.save(game);
-
-                return ResponseEntity.ok("HIT! " + opponent.getName() + " hat keine Schiffe mehr! "
-                        + shooter.getName() + " gewinnt!");
-            }
-
-            game.setCurrentTurn(opponent);
-            gameRepository.save(game);
-            return ResponseEntity.ok("HIT!");
-        }
-
-        game.setCurrentTurn(opponent);
-        gameRepository.save(game);
-        return ResponseEntity.ok("MISS!");
+        boolean hit = shipService.processGuess(targetPlayerId, x, y);
+        return ResponseEntity.ok(hit);
     }
-    @GetMapping("/player/{playerId}")
-    public List<Ship> getShipsByPlayer(@PathVariable Long playerId) {
-        return shipRepository.findByPlayerId(playerId);
-    }
-
-
 }
