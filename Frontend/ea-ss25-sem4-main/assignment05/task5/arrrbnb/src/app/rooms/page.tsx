@@ -19,22 +19,12 @@ export default async function Rooms({
       {/* Grid mit 3 Spalten */}
       <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {data.nodes.map((room) => (
-          <li
-            key={room.id}
-            className="border rounded-lg shadow hover:shadow-md transition overflow-hidden bg-white"
-          >
-            <img
-              src={room.heroUrl}
-              alt={room.title}
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4 space-y-2">
-              <h2 className="text-black font-semibold line-clamp-1">
-                {room.title}
-              </h2>
-              <p className="text-gray-600 text-sm line-clamp-2">
-                {room.description}
-              </p>
+          <li key={room.id} className="...">
+          <Link href={`/rooms/${room.id}`} className="block hover:opacity-90">
+            <img src={room.heroUrl} alt={room.title} className="w-full h-48 object-cover" />
+            <div className="p-4 space-y-2 text-black">
+              <h2 className="font-semibold line-clamp-1">{room.title}</h2>
+              <p className="text-gray-600 text-sm line-clamp-2">{room.description}</p>
               <p className="text-gray-400 text-xs">
                 Added on {new Date(room.createdAt).toLocaleDateString("en-US", {
                   month: "short",
@@ -42,7 +32,7 @@ export default async function Rooms({
                   year: "numeric",
                 })}
               </p>
-
+        
               <div className="flex justify-between items-center pt-2">
                 <p className="text-sm font-semibold text-emerald-600">
                   ${room.pricePerNight.amount}
@@ -54,13 +44,12 @@ export default async function Rooms({
                     alt={room.owner.firstName}
                     className="w-6 h-6 rounded-full"
                   />
-                  <span className="text-sm text-gray-800">
-                    {room.owner.firstName}
-                  </span>
+                  <span className="text-sm text-gray-800">{room.owner.firstName}</span>
                 </div>
               </div>
             </div>
-          </li>
+          </Link>
+        </li>
         ))}
       </ul>
 
