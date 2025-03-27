@@ -1,23 +1,38 @@
 "use server";
 
 import { API_URL } from "@/config";
+import { RoomInput } from "@/types";
+import { redirect } from "next/navigation";
 
-export async function createRoom( room: {
-  title: string;
-  description: string;
-  heroUrl: string;
-  pricePerNight: { amount: number; currency: string };
-}) {
+export async function createRoom(_: any, formData: FormData) {
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const heroUrl = formData.get("heroUrl") as string;
+  const amount = Number(formData.get("amount"));
+
+  if (!heroUrl.startsWith("https://c.pxhere.com/")) {
+    return { error: "Image URL must start with https://c.pxhere.com/" };
+  }
+
+  const room: RoomInput = {
+    title,
+    description,
+    heroUrl,
+    pricePerNight: {
+      amount,
+      currency: "USD",
+    },
+  };
+
   const response = await fetch(`${API_URL}/rooms`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      title: "Test Room",
-      description: "Just a test room",
-      heroUrl: "https://c.pxhere.com/photos/2f/03/room_window_light-865295.jpg!d",
-      pricePerNight: { amount: 100, currency: "USD" },
-    }),
+    body: JSON.stringify(room),
   });
 
-  console.log("Server response:", response.status);
+  if (!response.ok) {
+    return { error: "Room creation failed!" };
+  }
+
+  redirect("/rooms");
 }
